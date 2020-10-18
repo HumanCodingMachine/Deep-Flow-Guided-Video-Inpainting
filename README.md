@@ -1,5 +1,5 @@
 # Getting started with Docker
-
+[![Run on Ainize](https://ainize.ai/images/run_on_ainize_button.svg)](https://ainize.web.app/redirect?git_repo=https://github.com/HumanCodingMachine/Deep-Flow-Guided-Video-Inpainting)
 In order to replicate the results smoothly and avoid dependency errors (aka CUDA installation hell) you can use Docker combined with NVIDIA-Docker. Docker will install all the packages in an isolated environment.
 
 Note: You will need an NVIDIA GPU and a Linux OS to use NVIDIA-Docker.
