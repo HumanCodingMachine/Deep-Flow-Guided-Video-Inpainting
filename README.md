@@ -1,86 +1,38 @@
-# Deep Flow-Guided Video Inpainting
-[CVPR 2019 Paper](https://arxiv.org/abs/1905.02884) | [Project Page](https://nbei.github.io/video-inpainting.html) | [YouTube](https://www.youtube.com/watch?v=LIJPUsrwx5E) | [BibeTex](#citation)
+# Getting started with Docker
 
-<img src="https://github.com/nbei/Deep-Flow-Guided-Video-Inpainting/blob/master/gif/captain.gif" width="860"/>
+In order to replicate the results smoothly and avoid dependency errors (aka CUDA installation hell) you can use Docker combined with NVIDIA-Docker. Docker will install all the packages in an isolated environment.
 
-## Install & Requirements
-The code has been tested on pytorch=0.4.0 and python3.6. Please refer to `requirements.txt` for detailed information. 
+Note: You will need an NVIDIA GPU and a Linux OS to use NVIDIA-Docker.
+ 
+## Installing Docker
+* [Docker](https://gist.github.com/enric1994/3b5c20ddb2b4033c4498b92a71d909da)
+* [Docker-Compose](https://gist.github.com/enric1994/3b5c20ddb2b4033c4498b92a71d909da)
+* [nvidia-docker](https://github.com/NVIDIA/nvidia-docker#ubuntu-16041804-debian-jessiestretchbuster)
 
-Alternatively, you can run it with the provided [Docker image](docker/README.md).
+## Downloading the required files
+* Download the `frames` and `masks` folders from [here](https://drive.google.com/drive/folders/13aMItboZBxPnbjlOCbKLg7nxZgBWQt9P) and place them on the `demo` folder.
 
-**To Install python packages**
+* Download the files `FlowNet2_checkpoint.pth.tar`, `imagenet_deepfill.pth` and `resnet101_movie.pth` from [here](https://drive.google.com/drive/folders/1Nh6eJsue2IkP_bsN02SRPvWzkIi6cNbE) and place them in `pretrained_models`.
+
 ```
-pip install -r requirements.txt
+├── demo
+│   ├── frames
+│   └── masks
+├── pretrained_models
+│   ├── FlowNet2_checkpoint.pth.tar
+│   ├── imagenet_deepfill.pth
+│   └── resnet101_movie.pth
 ```
-**To Install flownet2 modules**
-```
-bash install_scripts.sh
-```
-## Componets
-There exist three components in this repo:
-* Video Inpainting Tool: DFVI
-* Extract Flow: FlowNet2(modified by [Nvidia official version](https://github.com/NVIDIA/flownet2-pytorch/tree/python36-PyTorch0.4))
-* Image Inpainting(reimplemented from [Deepfillv1](https://github.com/JiahuiYu/generative_inpainting))
+
 
 ## Usage
-* To use our video inpainting tool for object removing, we recommend that the frames should be put into `xxx/video_name/frames`
-and the mask of each frame should be put into `xxx/video_name/masks`. 
-And please download the resources of the demo and model weights from [here](https://drive.google.com/drive/folders/1a2FrHIQGExJTHXxSIibZOGMukNrypr_g?usp=sharing).
-An example demo containing frames and masks has been put into the demo and running the following command will get the result:
-```
-python tools/video_inpaint.py --frame_dir ./demo/frames --MASK_ROOT ./demo/masks --img_size 512 832 --FlowNet2 --DFC --ResNet101 --Propagation 
-```
-<img src="https://github.com/nbei/Deep-Flow-Guided-Video-Inpainting/blob/master/gif/flamingo.gif" width="850"/>
+1. From the `docker` folder run: `docker-compose up -d` 
 
-We provide the original model weight used in our movie demo which use ResNet101 as backbone and other related weights pls download from [here](https://drive.google.com/drive/folders/1a2FrHIQGExJTHXxSIibZOGMukNrypr_g?usp=sharing). 
-Please refer to [tools](https://github.com/nbei/Deep-Flow-Guided-Video-Inpainting/tree/master/tools) for detailed use and training settings. 
+2. Access the conatiner: `docker exec -it inpainting bash` 
 
-* For fixed region inpainting, we provide the model weights of refined stages in DAVIS. Please download the lady-running resources [link](https://drive.google.com/drive/folders/1GHV1g1IkpGa2qhRnZE2Fv30RXrbHPH0O?usp=sharing) and 
-model weights [link](https://drive.google.com/drive/folders/1zIamN-DzvknZLf5QAGCfvWs7a6qUqaaC?usp=sharing). The following command can help you to get the result:
-```
-CUDA_VISIBLE_DEVICES=0 python tools/video_inpaint.py --frame_dir ./demo/lady-running/frames \
---MASK_ROOT ./demo/lady-running/mask_bbox.png \
---img_size 448 896 --DFC --FlowNet2 --Propagation \
---PRETRAINED_MODEL_1 ./pretrained_models/resnet50_stage1.pth \
---PRETRAINED_MODEL_2 ./pretrained_models/DAVIS_model/davis_stage2.pth \
---PRETRAINED_MODEL_3 ./pretrained_models/DAVIS_model/davis_stage3.pth \
---MS --th_warp 3 --FIX_MASK
-```
-<img src="https://github.com/nbei/Deep-Flow-Guided-Video-Inpainting/blob/master/gif/lady-running-res.gif" width="850"/>
-You can just change the **th_warp** param for getting better results in your video. 
+That will open a CLI on the Docker container. Now you can run the demo scripts, for example:
 
-* To extract flow for videos:
-```
-python tools/infer_flownet2.py --frame_dir xxx/video_name/frames
-```
+`python3 tools/video_inpaint.py --frame_dir ./demo/frames --MASK_ROOT ./demo/masks --img_size 512 832 --FlowNet2 --DFC --ResNet101 --Propagation`
 
-* To use the Deepfillv1-Pytorch model for image inpainting,
-```
-python tools/frame_inpaint.py --test_img xxx.png --test_mask xxx.png --image_shape 512 512
-```
 
-## Update
-* More results can be found and downloaded [here](https://www.dropbox.com/sh/jxcl4he5bgsmk7t/AADxnfqHj-PGcjxd02Bil56ya?dl=0). 
-* **Support for PyTorch>1.0:** Sorry for the late update and the pre-release verison for supporting PyTorch>1.0 has been integrated into our new [v1.1 branch](https://github.com/nbei/Deep-Flow-Guided-Video-Inpainting/tree/v1.1).
-
-* The frames and masks of our movie demo have been put into [Google Drive](https://drive.google.com/drive/folders/1z2n1LzVY8gjvy7ezF_tuuMgVouR_pFcz?usp=sharing).
-* The weights of DAVIS's refined stages have been released and you can download from [here](https://drive.google.com/drive/folders/1zIamN-DzvknZLf5QAGCfvWs7a6qUqaaC?usp=sharing).
-Please refer to [Usage](#Usage) for using the Multi-Scale models.
-## FAQ
-* Errors when running install_scripts.sh
-if you meet some problem about gcc when compiling, pls check if the following commands will help:
-```
-export CXXFLAGS="-std=c++11"
-export CFLAGS="-std=c99"
-```
-
-## Citation
-```
-@InProceedings{Xu_2019_CVPR,
-author = {Xu, Rui and Li, Xiaoxiao and Zhou, Bolei and Loy, Chen Change},
-title = {Deep Flow-Guided Video Inpainting},
-booktitle = {The IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
-month = {June},
-year = {2019}
-}
-```
+Tested on Ubuntu 18.04 with a GTX 1060 GPU (drivers 410.104). Not working on higher architectures such as sm_75 (Turing), e.g. RTX 2080 Ti
